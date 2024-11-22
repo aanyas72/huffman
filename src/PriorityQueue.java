@@ -4,29 +4,24 @@ public class PriorityQueue {
     private LinkedList<TreeNode> queue;
 
     public PriorityQueue() {
+        queue = new LinkedList<>();
     }
 
-    public boolean addQ(TreeNode node) {
-
-        if (queue == null) {
-            queue = new LinkedList<>();
-            queue.add(node);
-        } else {
-            // store the node based on frequency
-            int index = 0;
-            while(index < queue.size()){
-                if(queue.get(index).compareTo(node) > 0) {
-                    queue.add(index, node);
-                    return true;
-                }
-                index++;
+    public boolean enqueue(TreeNode node) {
+        // store the node based on frequency
+        int index = 0;
+        while (index < queue.size()) {
+            if (queue.get(index).compareTo(node) > 0) {
+                queue.add(index, node);
+                return true;
             }
-            queue.add(node);
+            index++;
         }
+        queue.add(node);
         return false;
     }
 
-    public void dequeue() {
+    public TreeNode dequeue() {
         while (queue.size() >= 2) {
             TreeNode left = queue.get(0);
             queue.remove();
@@ -35,8 +30,13 @@ public class PriorityQueue {
 
             TreeNode node = new TreeNode(left,
                     left.getFrequency() + right.getFrequency(), right);
-            addQ(node);
+            enqueue(node);
         }
+        return queue.get(0);
+    }
+
+    public TreeNode get() {
+        return queue.get(0);
     }
 
     public void remove() {
@@ -47,5 +47,7 @@ public class PriorityQueue {
         return queue.toString();
     }
 
-
+    public int size() {
+        return queue.size();
+    }
 }
