@@ -137,7 +137,6 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
 
         writeData(outputStream, freqMap.get(IHuffConstants.PSEUDO_EOF));
-        System.out.println(freqMap);
 
         inputStream.close();
         outputStream.close();
@@ -147,7 +146,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
     public void writeData(BitOutputStream outputStream, String encodedValue) {
         for (int i = 0; i < encodedValue.length(); i++) {
-            if (encodedValue.charAt(i) == 0) {
+            if (encodedValue.charAt(i) == '0') {
                 outputStream.writeBits(1, 0);
             } else {
                 outputStream.writeBits(1, 1);
