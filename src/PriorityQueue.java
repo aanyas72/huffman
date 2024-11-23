@@ -7,6 +7,9 @@ public class PriorityQueue {
         queue = new LinkedList<>();
     }
 
+    /**
+     * Add treenodes to the priority queue
+     */
     public boolean enqueue(TreeNode node) {
         // store the node based on frequency
         int index = 0;

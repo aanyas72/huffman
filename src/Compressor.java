@@ -5,6 +5,11 @@ import java.util.Map;
 
 public class Compressor {
 
+    /**
+     * Counts the frequencies of the values in the file and puts them into a frequency array
+     * where each index represents the ascii value and the value at the index represents the
+     * amount of times this value occurs.
+     */
     public int[] countFrequencies(InputStream in) throws IOException {
         BitInputStream inputStream = new BitInputStream(in);
         int[] frequencies = new int[IHuffConstants.ALPH_SIZE + 1];
@@ -23,6 +28,9 @@ public class Compressor {
         return frequencies;
     }
 
+    /**
+     * Creates a huffman tree from the frequency array
+     */
     public TreeNode createHuffmanTree(int[] frequencies) {
         PriorityQueue queue = new PriorityQueue();
 
@@ -39,6 +47,7 @@ public class Compressor {
 
     /**
      * Gets the number of bits in the encoded tree representation
+     *
      * @param node is not null
      */
     public int numOfTreeBits(TreeNode node) {
@@ -50,28 +59,38 @@ public class Compressor {
 
     }
 
-    public void preOrder(BitOutputStream stream, TreeNode node){
-        if(node.isLeaf()){
+    /**
+     * Write the encoded values of the tree into the header so it can be reconstructed
+     */
+    public void preOrder(BitOutputStream stream, TreeNode node) {
+        if (node.isLeaf()) {
             // leaf node, add a 1
-            stream.writeBits(1,1);
-            stream.writeBits(IHuffConstants.BITS_PER_INT + 1, node.getValue());
+            stream.writeBits(1, 1);
+            stream.writeBits(IHuffConstants.BITS_PER_WORD + 1, node.getValue());
 
-        } else{
+        } else {
             // internal node, add a 0 and continue traversing
-            stream.writeBits(1,0);
+            stream.writeBits(1, 0);
             preOrder(stream, node.getLeft());
             preOrder(stream, node.getRight());
         }
     }
 
+    /**
+     * Create a map using the tree that maps the ascii representation of the value (Integer) to the
+     * encoded value (String)
+     */
     public HashMap<Integer, String> createMap(TreeNode root) {
         HashMap<Integer, String> m = new HashMap<>();
         mapHelper(root, "", m);
         return m;
     }
 
+    /**
+     * Helper method to create the encoding values for the value.
+     */
     private void mapHelper(TreeNode node, String encodedVal, Map<Integer, String> map) {
-        if(!node.isLeaf()){
+        if (!node.isLeaf()) {
             mapHelper(node.getLeft(), encodedVal + "0", map);
             mapHelper(node.getRight(), encodedVal + "1", map);
         } else {
@@ -82,6 +101,7 @@ public class Compressor {
 
     /**
      * Gets the original number of bits in a file
+     *
      * @param frequencies, an array of length 257 that stores the frequency of characters in file
      * @return the number of bits in the original file
      */
@@ -95,6 +115,9 @@ public class Compressor {
         return bits;
     }
 
+    /**
+     * Find the number of bits in the file body after compressing the file
+     */
     public int getBitsAfterEncoding(int[] frequencies, HashMap<Integer, String> map) {
         int bit = 0;
 
@@ -109,7 +132,18 @@ public class Compressor {
         return bit;
     }
 
-
+    /**
+     * Helper method to write the encoded value of the actual value onto the file
+     */
+    public void writeData(BitOutputStream outputStream, String encodedValue) {
+        for (int i = 0; i < encodedValue.length(); i++) {
+            if (encodedValue.charAt(i) == '0') {
+                outputStream.writeBits(1, 0);
+            } else {
+                outputStream.writeBits(1, 1);
+            }
+        }
+    }
 
 
 }
