@@ -15,6 +15,7 @@ public class Decompressor {
                        TreeNode node) throws IOException {
         TreeNode currentNode = root;
         boolean done = false;
+        int countBits = 0;
         while(!done) {
             int bit = inputStream.readBits(1);
             if (bit == -1) {
@@ -22,20 +23,22 @@ public class Decompressor {
                         "unexpected end of input. No PSEUDO_EOF value.");
             } else {
                 if (bit == 0) {
-                    decode(inputStream, node.getLeft());
+                    currentNode = currentNode.getLeft());
                 }  else if (bit == 1) {
-                    decode(inputStream, node.getRight());
+                    currentNode = currentNode.getRight());
                 }
                if (node.isLeaf()) {
                    if (node.getValue() == IHuffConstants.PSEUDO_EOF) {
                        done = true;
                    } else {
                        outputStream.writeBits(IHuffConstants.BITS_PER_WORD, node.getValue());
+                       countBits += IHuffConstants.BITS_PER_WORD;
+                       currentNode = root;
                    }
                }
             }
         }
-        return node;
+        return countBits;
 
     }
 }
