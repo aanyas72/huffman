@@ -10,7 +10,32 @@ public class Decompressor {
         return queue.get();
     }
 
-    public void recreateFile(BitOutputStream outputStream, TreeNode node) {
+    // read 1 bit at a time and walk tree
+    private int decode(BitInputStream inputStream, BitOutputStream outputStream,
+                       TreeNode node) throws IOException {
+        TreeNode currentNode = root;
+        boolean done = false;
+        while(!done) {
+            int bit = inputStream.readBits(1);
+            if (bit == -1) {
+                throw new IOException("Error reading compressed file. \n" +
+                        "unexpected end of input. No PSEUDO_EOF value.");
+            } else {
+                if (bit == 0) {
+                    decode(inputStream, node.getLeft());
+                }  else if (bit == 1) {
+                    decode(inputStream, node.getRight());
+                }
+               if (node.isLeaf()) {
+                   if (node.getValue() == IHuffConstants.PSEUDO_EOF) {
+                       done = true;
+                   } else {
+                       outputStream.writeBits(IHuffConstants.BITS_PER_WORD, node.getValue());
+                   }
+               }
+            }
+        }
+        return node;
 
     }
 }
