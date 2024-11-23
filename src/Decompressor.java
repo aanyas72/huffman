@@ -68,8 +68,8 @@ public class Decompressor {
                     } else {
                         outputStream.writeBits(IHuffConstants.BITS_PER_WORD, node.getValue());
                         countBits += IHuffConstants.BITS_PER_WORD;
-                        currentNode = node;
                     }
+                    currentNode = node;
                 }
             }
         }
