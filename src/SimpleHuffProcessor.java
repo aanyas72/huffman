@@ -201,12 +201,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
             }
 
-
-
-
-            inputStream.close();
-            outputStream.close();
-	        return 0;
+	    return decompressor.decode(inputStream, outputStream, root);
     }
 
     // read 1 bit at a time and walk tree
